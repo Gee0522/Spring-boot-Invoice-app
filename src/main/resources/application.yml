@@ -1,4 +1,6 @@
 spring:
+    autoconfigure:
+      exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     datasource:
         url: jdbc:mysql://127.0.0.1:3306/securecode
         password: fffHgy34#05123
@@ -10,11 +12,16 @@ spring:
         hibernate:
             ddl-auto: update
         properties:
+            application:
+                title: Welcome to Greg's Spring App
+                version: 1.0
             hibernate:
                 globally_quoted_identifiers: true
-                dialect: org.hibernate.dialect.MySQL8Dialect
+                dialect: org.hibernate.dialect.MySQLDialect
                 format_sql: true
+        open-in-view: true
     sql:
         init:
-            mode: always
+            mode: never
             continue-on-error: false
+

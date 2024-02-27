@@ -1,7 +1,6 @@
 package com.solocode.securecode.repository;
 
 import com.solocode.securecode.domain.Role;
-import com.solocode.securecode.domain.User;
 
 import java.util.Collection;
 
@@ -16,6 +15,8 @@ public interface RoleRepository <T extends Role> {
     Boolean delete(Long id);
 
 //    More complex operations
-    void addRoleToUser(Long userid, String roleName);
-
+    void addRoleToUser(Long userId, String roleName);
+    Role getRoleByUserId(Long userId);
+    Role getRoleByUserEmail(Long userId);
+    void updateUserRole(Long userId, String roleName);
 }

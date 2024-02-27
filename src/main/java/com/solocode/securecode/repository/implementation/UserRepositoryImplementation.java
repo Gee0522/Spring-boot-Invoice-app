@@ -7,7 +7,6 @@ import com.solocode.securecode.repository.RoleRepository;
 import com.solocode.securecode.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -21,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.solocode.securecode.enumeration.RoleType.*;
+import static com.solocode.securecode.enumeration.RoleType.ROLE_USER;
 import static com.solocode.securecode.enumeration.VerificationType.ACCOUNT;
 import static com.solocode.securecode.query.UserQuery.*;
 import static java.util.Objects.requireNonNull;
@@ -43,22 +42,15 @@ public class UserRepositoryImplementation implements UserRepository<User> {
 //        Save new user
         try {
             KeyHolder holder = new GeneratedKeyHolder();
-
             SqlParameterSource parameters = getSqlParameterSource(user);
-
             jdbc.update(INSERT_USER_QUERY, parameters, holder);
-
             user.setId(requireNonNull(holder.getKey()).longValue());
-
             // Add role to the user
             roleRepository.addRoleToUser(user.getId(), ROLE_USER.name());
-
             // send verification URL
             String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
-
             //save URL in verification table
             jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY, Map.of("userId", user.getId(), "url", verificationUrl));
-
             //Send email to user with verification URL
 //            emailService.sendVerificationUrl(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT.getType());
             user.setEnabled(false);
@@ -67,9 +59,8 @@ public class UserRepositoryImplementation implements UserRepository<User> {
 //        Return the newly created user
             return user;
 //        if any errors, throw exception with proper message
-        } catch (EmptyResultDataAccessException exception) {
-            throw  new ApiException("No role found by name: " + ROLE_USER.name());
         } catch (Exception exception) {
+            log.error(exception.getMessage());
             throw  new ApiException("An error occurred. Please try again");
         }
     }
